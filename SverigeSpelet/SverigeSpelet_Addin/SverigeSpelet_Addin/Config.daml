@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ArcGIS defaultAssembly="SverigeSpelet_Addin.dll"
+        defaultNamespace="SverigeSpelet_Addin"
+        xmlns="http://schemas.esri.com/DADF/Registry"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
+
+  <AddInInfo id="{c8806acd-0eb6-4974-b0d7-e9a18d10809b}" version="1.0" desktopVersion="3.5.57366" product="ArcGISPro">
+    <Name>SverigeSpelet_Addin</Name>   
+    <Description>SverigeSpelet_Addin description</Description>
+    <Image>Images\AddinDesktop32.png</Image>
+    <Author>emsson</Author>
+    <Company>Lantmateriet</Company>
+    <Date>10/7/2025 9:48:13 AM</Date>
+    <Subject>Framework</Subject>
+    <!-- Note subject can be one or more of these topics:
+                    Content, Framework, Editing, Geodatabase, Geometry, Geoprocessing, Layouts, Map Authoring, Map Exploration -->
+  </AddInInfo>
+
+  <modules>
+    <insertModule id="SverigeSpelet_Addin_Module" className="Module1" autoLoad="false" caption="Module1">
+      <!-- uncomment to have the control hosted on a separate tab-->
+      <tabs>
+        <!--<tab id="SverigeSpelet_Addin_Tab1" caption="New Tab">
+          <group refID="SverigeSpelet_Addin_Group1"/>
+        </tab>-->
+      </tabs>
+              
+      <groups>
+        <!-- comment this out if you have no controls on the Addin tab to avoid
+              an empty group-->
+        <group id="SverigeSpelet_Addin_Group1" caption="Group 1" appearsOnAddInTab="true">
+          <!-- host controls within groups -->
+        </group>
+      </groups>
+      
+      <controls>
+        <!-- add your controls here -->
+      </controls> 
+      
+    </insertModule>
+  </modules>
+</ArcGIS>
