@@ -25,11 +25,27 @@ namespace SverigeSpelet
             InitializeComponent();
         }
 
-        private void BtnStarta_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void BtnStarta_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+<<<<<<< Updated upstream
             // Denna kod kommer att kopplas till ViewModel
+=======
+            System.Diagnostics.Debug.WriteLine("Starta-knappen klickad");
+
+>>>>>>> Stashed changes
             var viewModel = this.DataContext as SverigeSpeletDockpaneViewModel;
-            viewModel?.StartaSpel();
+            if (viewModel != null)
+            {
+                await viewModel.StartaSpel();
+            }
+        }
+
+        private void BtnAvsluta_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Avsluta-knappen klickad");
+
+            var viewModel = this.DataContext as SverigeSpeletDockpaneViewModel;
+            viewModel?.AvslutaSpel();
         }
 
         private void BtnUppdateraTopplista_Click(object sender, System.Windows.RoutedEventArgs e)

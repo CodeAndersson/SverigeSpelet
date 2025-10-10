@@ -1,8 +1,9 @@
-﻿using ArcGIS.Desktop.Mapping;
-using ArcGIS.Desktop.Framework;
-using ArcGIS.Desktop.Framework.Threading.Tasks;
+﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ArcGIS.Desktop.Framework;
+using ArcGIS.Desktop.Framework.Threading.Tasks;
+using ArcGIS.Desktop.Mapping;
 
 namespace SverigeSpelet
 {
@@ -17,10 +18,10 @@ namespace SverigeSpelet
 
         protected override void OnToolMouseDown(MapViewMouseButtonEventArgs e)
         {
-            // Markera event som hanterat när vänster musknapp trycks ned
             if (e.ChangedButton == MouseButton.Left)
             {
                 e.Handled = true;
+                System.Diagnostics.Debug.WriteLine("MapTool: Vänsterklick fångat");
             }
         }
 
@@ -28,13 +29,31 @@ namespace SverigeSpelet
         {
             return QueuedTask.Run(() =>
             {
-                // Konvertera musposition till kartkoordinater
-                var mapClickPoint = MapView.Active.ClientToMap(e.ClientPoint);
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("MapTool: HandleMouseDownAsync startar");
 
-                // Skicka klicket till vår DockPane
-                var dockpane = FrameworkApplication.DockPaneManager.Find("SverigeSpelet_SverigeSpeletDockpane") as SverigeSpeletDockpaneViewModel;
-                dockpane?.HanteraKartKlick(mapClickPoint);
+                    var mapClickPoint = MapView.Active.ClientToMap(e.ClientPoint);
+                    System.Diagnostics.Debug.WriteLine($"Klickposition: {mapClickPoint.X}, {mapClickPoint.Y}");
+
+                    var dockpane = FrameworkApplication.DockPaneManager.Find("SverigeSpelet_SverigeSpeletDockpane") as SverigeSpeletDockpaneViewModel;
+
+                    if (dockpane != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Skickar kartklick till DockPane");
+                        dockpane.HanteraKartKlick(mapClickPoint);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("DockPane inte hittad");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Fel i MapTool: {ex.Message}");
+                }
             });
         }
+
     }
 }

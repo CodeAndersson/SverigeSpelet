@@ -8,9 +8,9 @@ namespace SverigeSpelet
 {
     public class SpelResultat
     {
-        public string SpelareNamn { get; set; }
-        public int Poäng { get; set; }
-        public DateTime Datum { get; set; }
-        public string Svårighetsgrad { get; set; }
+        public string PlayerName { get; set; }
+        public int Points { get; set; }
+        public DateTime Date { get; set; }
+        public string DifficultyLevel { get; set; }
     }
 }
