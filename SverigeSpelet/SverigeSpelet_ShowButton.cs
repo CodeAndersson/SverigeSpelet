@@ -25,8 +25,7 @@ namespace SverigeSpelet
     {
         protected override void OnClick()
         {
-            var pane = FrameworkApplication.DockPaneManager.Find("SverigeSpelet_SverigeSpeletDockpane");
-            pane?.Activate();
+            SverigeSpeletDockpaneViewModel.Show();
         }
     }
 }

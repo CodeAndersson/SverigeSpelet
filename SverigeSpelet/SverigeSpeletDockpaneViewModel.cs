@@ -528,9 +528,9 @@ namespace SverigeSpelet
                 if (targetPoint == null)
                     return double.MaxValue;
 
-                var deltaX = clickedPoint.X - targetPoint.X;
-                var deltaY = clickedPoint.Y - targetPoint.Y;
-                var distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    }
+}
 
                 return distance;
             }
