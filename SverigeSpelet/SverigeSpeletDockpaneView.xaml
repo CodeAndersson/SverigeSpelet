@@ -9,7 +9,7 @@
         <TabControl>
             <!-- Huvudflikan - visar antingen inställningar eller spel -->
             <TabItem Header="Sverige Spelet" x:Name="tabHuvud">
-                <Grid>
+                <Grid Height="414" Width="285">
                     <!-- START VY -->
                     <StackPanel x:Name="pnlInställningar" Margin="10" Visibility="{Binding ShowSettingsView}">
                         <TextBlock Text="Välj kategori:" FontWeight="Bold" Margin="0,0,0,5"/>

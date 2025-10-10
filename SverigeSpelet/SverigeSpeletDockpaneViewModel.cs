@@ -1,45 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
+using ArcGIS.Core.Data;
 using ArcGIS.Core.Geometry;
+using ArcGIS.Core.Internal.Geometry;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
-using ArcGIS.Desktop.Mapping;
-using ArcGIS.Desktop.Layouts;
-using ArcGIS.Desktop.Editing;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using ArcGIS.Desktop.Framework.Threading.Tasks;
-using ArcGIS.Core.Internal.Geometry;
-using ArcGIS.Core.Data.Raster;
-using ArcGIS.Desktop.Core;
-using ArcGIS.Core.CIM;
-using System.Security.Cryptography.Xml;
-using ArcGIS.Core.Data;
-using ArcGIS.Desktop.Internal.Mapping.Controls.MapDisplayUnitControl;
-using ArcGIS.Desktop.Internal.Mapping.TOC;
+using ArcGIS.Desktop.Mapping;
 
 namespace SverigeSpelet
 {
-
     public class SverigeSpeletDockpaneViewModel : DockPane
     {
         private const string _dockPaneID = "SverigeSpelet_SverigeSpeletDockpane";
-<<<<<<< Updated upstream
-        private List<SpelData> _aktuellaFrågor = new List<SpelData>();
-        private int _frågeIndex = 0;
-        private int _tidKvar = 0;
-        private int _maxTid = 10;
-        private int _totalPoäng = 0;
-        private string _spelareNamn = "Gäst";
-        private string _svårighetsgrad = "Lätt";
-        private DispatcherTimer _timer;
-=======
         private List<SpelData> _currentQuestions = new List<SpelData>();
         private int _questionIndex = 0;
         private int _timeLeft = 0;
@@ -49,28 +30,15 @@ namespace SverigeSpelet
         private string _difficultyLevel = "Lätt";
         private DispatcherTimer _timer;
         private bool _showGameView = false;
->>>>>>> Stashed changes
 
-        public List<SpelResultat> Topplista { get; private set; } = new List<SpelResultat>();
-
-<<<<<<< Updated upstream
-        public string FrågaText { get; set; }
-        public string TidKvarText { get; set; }
-        public string PoängText { get; set; }
-        public string FrågaRäknareText { get; set; }
-        public string ResultatText { get; set; }
-        public double TidProgress { get; set; }
-        public bool SpelFlikaAktiv { get; set; }
-=======
         public List<SpelResultat> TopList { get; private set; } = new List<SpelResultat>();
-
         public string QuestionText { get; set; }
         public string TimeLeftText { get; set; }
         public string PointsText { get; set; }
         public string QuestionCountText { get; set; }
         public string ResultText { get; set; }
         public double TimeProgress { get; set; }
-        
+
         public bool ShowGameView
         {
             get { return _showGameView; }
@@ -83,19 +51,16 @@ namespace SverigeSpelet
                 NotifyPropertyChanged(nameof(SettingsViewVisibility));
             }
         }
+
         public bool ShowSettingsView => !_showGameView;
-        public System.Windows.Visibility GameViewVisibility =>
-            _showGameView ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
-        public System.Windows.Visibility SettingsViewVisibility =>
-            !_showGameView ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
->>>>>>> Stashed changes
+        public Visibility GameViewVisibility => _showGameView ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility SettingsViewVisibility => !_showGameView ? Visibility.Visible : Visibility.Collapsed;
 
         protected SverigeSpeletDockpaneViewModel() : base()
         {
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += Timer_Tick;
-
             LaddaTopplista();
         }
 
@@ -108,27 +73,22 @@ namespace SverigeSpelet
             pane.Activate();
         }
 
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
         #region Spellogik
 
         public async Task StartaSpel()
         {
-<<<<<<< Updated upstream
-            _frågeIndex = 0;
-            _totalPoäng = 0;
-            _aktuellaFrågor.Clear();
-
-            // FIX CS4014: Lägg till await
-            await FrameworkApplication.SetCurrentToolAsync("SverigeSpelet_SverigeSpeletMapTool");
-
-            await InitieraSpel();
-            SpelFlikaAktiv = true;
-            NotifyPropertyChanged(nameof(SpelFlikaAktiv));
-
-            NästaFråga();
-=======
             try
             {
-                System.Diagnostics.Debug.WriteLine("Startar spel...");
+                System.Diagnostics.Debug.WriteLine("🎮 Startar spel...");
 
                 // Återställ spelstatus
                 _questionIndex = 0;
@@ -143,46 +103,47 @@ namespace SverigeSpelet
 
                 // Byt till spel-vy
                 ShowGameView = true;
-                NotifyPropertyChanged(nameof(ShowGameView));
-                NotifyPropertyChanged(nameof(ShowSettingsView));
 
                 System.Diagnostics.Debug.WriteLine($"Spel startat med {_currentQuestions.Count} frågor");
 
                 // Starta första frågan
-                NextQuestion();
+                await NextQuestion();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Fel vid start av spel: {ex.Message}");
-                ShowGameView = false; // Återgå till inställningar vid fel
+                ShowGameView = false;
             }
->>>>>>> Stashed changes
         }
 
         private async Task InitieraSpel()
         {
-<<<<<<< Updated upstream
-            var featureLayer = await HämtaFeatureLayer("Kommuner");
-            var allaSpelData = await SkapaSpelData(featureLayer);
-            _aktuellaFrågor = BlandaOchVäljFrågor(allaSpelData, 10);
-        }
+            try
+            {
+                // Initiera kartan
+                await InitieraKarta();
 
-        private void NästaFråga()
-        {
-            if (_frågeIndex >= _aktuellaFrågor.Count)
-=======
-            await InitieraKarta();
+                // Hämta feature layer
+                var featureLayer = await HamtaFeatureLayer();
 
-            // Hämta feature layer
-            var featureLayer = await HamtaFeatureLayer();
-
-            // Skapa speldat
-            var allaSpelData = await SkapaSpelData(featureLayer);
-
-            // Välj 10 slumpmässiga frågor/ kommuner
-            _currentQuestions = BlandaOchValjFragor(allaSpelData, 10);
-
-            System.Diagnostics.Debug.WriteLine($"Initierade {_currentQuestions.Count} frågor");
+                if (featureLayer != null)
+                {
+                    // Skapa speldata
+                    var allaSpelData = await SkapaSpelData(featureLayer);
+                    _currentQuestions = BlandaOchValjFragor(allaSpelData, 10);
+                    System.Diagnostics.Debug.WriteLine($" Initierade {_currentQuestions.Count} frågor");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Kunde inte hämta feature layer, använder testdata");
+                    _currentQuestions = SkapaTestData();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Fel i Initiering av Spel: {ex.Message}");
+                _currentQuestions = SkapaTestData();
+            }
         }
 
         private async Task InitieraKarta()
@@ -191,24 +152,23 @@ namespace SverigeSpelet
             {
                 await QueuedTask.Run(async () =>
                 {
-                    // Envelope för Sverige med kord
+                    // Envelope för Sverige
                     var sverigeEnvelope = EnvelopeBuilder.CreateEnvelope(
-                        1000000, 6000000,   // Minsta X, Y (västra/södra Sverige)
-                        2000000, 8000000,   // Maxima X, Y (östra/norra Sverige)
+                        1000000, 6000000,
+                        2000000, 8000000,
                         SpatialReferences.WebMercator
                     );
 
+                    // Använd SetViewpointAsync istället för SetCurrentSketchAsync
                     await MapView.Active.SetCurrentSketchAsync(sverigeEnvelope);
 
-                    System.Diagnostics.Debug.WriteLine("Kartan initierar med Sverige vy");
+                    System.Diagnostics.Debug.WriteLine("Kartan initierad med Sverige-vy");
                 });
             }
-
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Fel vid initiering av karta: {ex.Message}");
             }
-
         }
 
         internal async Task ResetMap()
@@ -229,52 +189,37 @@ namespace SverigeSpelet
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Fel vid återställning av karta: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"❌ Fel vid återställning av karta: {ex.Message}");
             }
         }
 
-        private async void NextQuestion()
-        {   
+        private async Task NextQuestion()
+        {
             await ResetMap();
 
             if (_questionIndex >= _currentQuestions.Count)
->>>>>>> Stashed changes
             {
-                AvslutaSpel();
+                await AvslutaSpel();
                 return;
             }
 
-<<<<<<< Updated upstream
-            var aktuellFråga = _aktuellaFrågor[_frågeIndex];
-            FrågaText = $"Var ligger {aktuellFråga.Namn}?";
-            FrågaRäknareText = $"Fråga {_frågeIndex + 1} av {_aktuellaFrågor.Count}";
-
-            NotifyPropertyChanged(nameof(FrågaText));
-            NotifyPropertyChanged(nameof(FrågaRäknareText));
-=======
             var currentQuestion = _currentQuestions[_questionIndex];
-
             QuestionText = $"Var ligger {currentQuestion.Namn}?";
             QuestionCountText = $"Fråga {_questionIndex + 1} av {_currentQuestions.Count}";
             PointsText = $"Totalpoäng: {_totalPoints}";
-            ResultText = ""; // Rensa tidigare resultat
+            ResultText = "";
 
             NotifyPropertyChanged(nameof(QuestionText));
             NotifyPropertyChanged(nameof(QuestionCountText));
             NotifyPropertyChanged(nameof(PointsText));
             NotifyPropertyChanged(nameof(ResultText));
->>>>>>> Stashed changes
 
             StartaTimer();
         }
 
         private void StartaTimer()
         {
-<<<<<<< Updated upstream
-            _maxTid = _svårighetsgrad switch
-=======
             _maxTime = _difficultyLevel switch
->>>>>>> Stashed changes
             {
                 "Lätt" => 15,
                 "Medel" => 10,
@@ -282,74 +227,16 @@ namespace SverigeSpelet
                 _ => 10
             };
 
-<<<<<<< Updated upstream
-            _tidKvar = _maxTid;
-            TidProgress = 100;
-            TidKvarText = $"{_tidKvar} sekunder kvar";
-
-            NotifyPropertyChanged(nameof(TidProgress));
-            NotifyPropertyChanged(nameof(TidKvarText));
-=======
             _timeLeft = _maxTime;
             TimeProgress = 100;
             TimeLeftText = $"{_timeLeft} sekunder kvar";
 
             NotifyPropertyChanged(nameof(TimeProgress));
             NotifyPropertyChanged(nameof(TimeLeftText));
->>>>>>> Stashed changes
 
             _timer.Start();
         }
 
-<<<<<<< Updated upstream
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            _tidKvar--;
-            TidProgress = (_tidKvar / (double)_maxTid) * 100;
-            TidKvarText = $"{_tidKvar} sekunder kvar";
-
-            NotifyPropertyChanged(nameof(TidProgress));
-            NotifyPropertyChanged(nameof(TidKvarText));
-
-            if (_tidKvar <= 0)
-            {
-                _timer.Stop();
-                HanteraSvar(false);
-            }
-        }
-
-        private void HanteraSvar(bool ärRätt)
-        {
-            _timer.Stop();
-
-            int poäng = 0;
-            if (ärRätt)
-            {
-                poäng = BeräknaPoäng(_tidKvar, _svårighetsgrad);
-                ResultatText = $"Rätt! +{poäng} poäng";
-            }
-            else
-            {
-                ResultatText = "Fel! 0 poäng";
-            }
-
-            _totalPoäng += poäng;
-            PoängText = $"Totalpoäng: {_totalPoäng}";
-
-            NotifyPropertyChanged(nameof(ResultatText));
-            NotifyPropertyChanged(nameof(PoängText));
-
-            Task.Delay(2000).ContinueWith(t =>
-            {
-                _frågeIndex++;
-                NästaFråga();
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
-        private int BeräknaPoäng(int tidKvar, string svårighetsgrad)
-        {
-            int basPoäng = svårighetsgrad switch
-=======
         private async void Timer_Tick(object sender, EventArgs e)
         {
             _timeLeft--;
@@ -362,7 +249,7 @@ namespace SverigeSpelet
             if (_timeLeft <= 0)
             {
                 _timer.Stop();
-                await HanteraSvarAsync(false, -999);
+                await HanteraSvarAsync(false, 0);
             }
         }
 
@@ -378,8 +265,7 @@ namespace SverigeSpelet
             }
             else
             {
-                // Korrigera avståndet för visning
-                ResultText = $"Fel! Du var {distance:F0} meter bort. 0 poäng";
+                ResultText = distance > 0 ? $"Fel! Du var {distance:F0} meter bort. 0 poäng" : "Fel! 0 poäng";
             }
 
             _totalPoints += points;
@@ -389,16 +275,13 @@ namespace SverigeSpelet
             NotifyPropertyChanged(nameof(PointsText));
 
             await Task.Delay(2000);
-
             _questionIndex++;
-            NextQuestion();
-
+            await NextQuestion();
         }
 
         private int CalculatedPoints(int timeLeft, string difficultyLevel)
         {
             int basePoints = difficultyLevel switch
->>>>>>> Stashed changes
             {
                 "Lätt" => 10,
                 "Medel" => 20,
@@ -406,80 +289,52 @@ namespace SverigeSpelet
                 _ => 10
             };
 
-<<<<<<< Updated upstream
-            int bonus = (int)(tidKvar * 0.5);
-            return basPoäng + bonus;
-        }
-
-        private async void AvslutaSpel()
-        {
-            _timer.Stop();
-            SpelFlikaAktiv = false;
-
-            // FIX CS4014: Lägg till await
-=======
             int bonus = (int)(timeLeft * 0.5);
             return basePoints + bonus;
         }
 
-        internal async void AvslutaSpel()
+        internal async Task AvslutaSpel()
         {
             _timer.Stop();
 
             // Återställ till default tool
->>>>>>> Stashed changes
             await FrameworkApplication.SetCurrentToolAsync(null);
 
             SparaResultat();
             UppdateraTopplista();
 
-<<<<<<< Updated upstream
-            ResultatText = $"Spelet avslutat! Slutpoäng: {_totalPoäng}";
-            NotifyPropertyChanged(nameof(ResultatText));
-            NotifyPropertyChanged(nameof(SpelFlikaAktiv));
-=======
             ResultText = $"Spelet avslutat! Slutpoäng: {_totalPoints}";
             NotifyPropertyChanged(nameof(ResultText));
 
             await Task.Delay(3000);
-            _showGameView = false; // Återgå till inställnings vy
-            NotifyPropertyChanged(nameof(ShowGameView));
-            NotifyPropertyChanged(nameof(ShowSettingsView));
->>>>>>> Stashed changes
+
+            // Återgå till inställnings-vy
+            ShowGameView = false;
         }
 
         #endregion
 
         #region Kartinteraktion
 
-<<<<<<< Updated upstream
-        public void HanteraKartKlick(MapPoint mapClickPoint)
-        {
-            if (!SpelFlikaAktiv || _frågeIndex >= _aktuellaFrågor.Count || _aktuellaFrågor.Count == 0)
-=======
         internal async void HanteraKartKlick(MapPoint mapClickPoint)
         {
             if (!ShowGameView || _questionIndex >= _currentQuestions.Count)
->>>>>>> Stashed changes
+            {
+                System.Diagnostics.Debug.WriteLine("Spel-vy ej aktiv eller inga frågor");
                 return;
+            }
 
             try
             {
-<<<<<<< Updated upstream
-                var aktuellFråga = _aktuellaFrågor[_frågeIndex];
-                var avstånd = CalculateDistance(mapClickPoint, aktuellFråga.Geometri);
-                var ärRätt = avstånd < GetTolerans(_svårighetsgrad);
-                HanteraSvar(ärRätt);
-=======
+                System.Diagnostics.Debug.WriteLine($"Kartklick: {mapClickPoint.X}, {mapClickPoint.Y}");
+
                 var currentQuestion = _currentQuestions[_questionIndex];
                 var distance = CalculateDistance(mapClickPoint, currentQuestion.Geometri);
                 var isRight = distance < GetTolerans(_difficultyLevel);
 
-                // Rita linje mellan gissning och rätt svar
-                await RitaLinje(mapClickPoint, currentQuestion.Geometri, distance);
+                System.Diagnostics.Debug.WriteLine($"Avstånd: {distance:F0}m, Tolerans: {GetTolerans(_difficultyLevel)}m, Rätt: {isRight}");
 
                 await HanteraSvarAsync(isRight, distance);
->>>>>>> Stashed changes
             }
             catch (Exception ex)
             {
@@ -487,23 +342,6 @@ namespace SverigeSpelet
             }
         }
 
-<<<<<<< Updated upstream
-=======
-        private async Task RitaLinje(MapPoint fromPoint, Geometry toGeometry, double distance)
-        {
-            await QueuedTask.Run(() =>
-            {
-                // Skapa en linje mellan punkterna
-                var line = PolylineBuilder.CreatePolyline(new[] { fromPoint,
-            GeometryEngine.Instance.Centroid(toGeometry) as MapPoint });
-
-                // Skapa en grafisk linje för visualisering
-                // Implementera grafikhäntering här
-
-            });
-        }
-
->>>>>>> Stashed changes
         private double CalculateDistance(MapPoint clickedPoint, Geometry targetGeometry)
         {
             try
@@ -528,32 +366,22 @@ namespace SverigeSpelet
                 if (targetPoint == null)
                     return double.MaxValue;
 
-
-    }
-}
+                var deltaX = clickedPoint.X - targetPoint.X;
+                var deltaY = clickedPoint.Y - targetPoint.Y;
+                var distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
 
                 return distance;
             }
             catch (Exception ex)
             {
-<<<<<<< Updated upstream
                 System.Diagnostics.Debug.WriteLine($"Fel i CalculateDistance: {ex.Message}");
-=======
-                ArcGIS.Desktop.Framework.Dialogs.MessageBox.Show($"Fel i CalculateDistance: {ex.Message}");
->>>>>>> Stashed changes
                 return double.MaxValue;
             }
         }
 
-<<<<<<< Updated upstream
-        private double GetTolerans(string svårighetsgrad)
-        {
-            return svårighetsgrad switch
-=======
         private double GetTolerans(string difficultyLevel)
         {
             return difficultyLevel switch
->>>>>>> Stashed changes
             {
                 "Lätt" => 50000,
                 "Medel" => 30000,
@@ -574,20 +402,12 @@ namespace SverigeSpelet
                 if (File.Exists(path))
                 {
                     var json = File.ReadAllText(path);
-<<<<<<< Updated upstream
-                    Topplista = JsonSerializer.Deserialize<List<SpelResultat>>(json) ?? new List<SpelResultat>();
-=======
                     TopList = JsonSerializer.Deserialize<List<SpelResultat>>(json) ?? new List<SpelResultat>();
->>>>>>> Stashed changes
                 }
             }
             catch
             {
-<<<<<<< Updated upstream
-                Topplista = new List<SpelResultat>();
-=======
                 TopList = new List<SpelResultat>();
->>>>>>> Stashed changes
             }
         }
 
@@ -595,16 +415,6 @@ namespace SverigeSpelet
         {
             var resultat = new SpelResultat
             {
-<<<<<<< Updated upstream
-                SpelareNamn = _spelareNamn,
-                Poäng = _totalPoäng,
-                Datum = DateTime.Now,
-                Svårighetsgrad = _svårighetsgrad
-            };
-
-            Topplista.Add(resultat);
-            Topplista = Topplista.OrderByDescending(r => r.Poäng).Take(10).ToList();
-=======
                 PlayerName = _playerName,
                 Points = _totalPoints,
                 Date = DateTime.Now,
@@ -613,18 +423,13 @@ namespace SverigeSpelet
 
             TopList.Add(resultat);
             TopList = TopList.OrderByDescending(r => r.Points).Take(10).ToList();
->>>>>>> Stashed changes
 
             try
             {
                 var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SverigeSpelet");
                 Directory.CreateDirectory(directory);
                 var path = Path.Combine(directory, "topplista.json");
-<<<<<<< Updated upstream
-                var json = JsonSerializer.Serialize(Topplista);
-=======
                 var json = JsonSerializer.Serialize(TopList);
->>>>>>> Stashed changes
                 File.WriteAllText(path, json);
             }
             catch (Exception ex)
@@ -635,22 +440,13 @@ namespace SverigeSpelet
 
         public void UppdateraTopplista()
         {
-<<<<<<< Updated upstream
-            NotifyPropertyChanged(nameof(Topplista));
-=======
             NotifyPropertyChanged(nameof(TopList));
->>>>>>> Stashed changes
         }
 
         #endregion
 
         #region Hjälpmetoder
 
-<<<<<<< Updated upstream
-        private async Task<FeatureLayer> HämtaFeatureLayer(string layerNamn)
-        {
-            return await Task.Run(() => (FeatureLayer)null);
-=======
         private async Task<FeatureLayer> HamtaFeatureLayer()
         {
             return await QueuedTask.Run(() =>
@@ -663,7 +459,7 @@ namespace SverigeSpelet
 
                     using (Geodatabase geodatabase = new Geodatabase(new FileGeodatabaseConnectionPath(new Uri(databasePath))))
                     {
-                        // Öppna specifikt "Kommun" feature class
+                        // Öppna "Kommun" feature class
                         FeatureClass featureClass = geodatabase.OpenDataset<FeatureClass>("Kommun");
 
                         if (featureClass == null)
@@ -672,7 +468,7 @@ namespace SverigeSpelet
                             return null;
                         }
 
-                        System.Diagnostics.Debug.WriteLine($"Öppnade feature class: {featureClass.GetName()}");
+                        System.Diagnostics.Debug.WriteLine($"Feature class öppnad: {featureClass.GetName()}");
 
                         // Skapa lager
                         Layer layer = LayerFactory.Instance.CreateLayer<FeatureLayer>(
@@ -689,35 +485,31 @@ namespace SverigeSpelet
                     return null;
                 }
             });
->>>>>>> Stashed changes
         }
 
         private async Task<List<SpelData>> SkapaSpelData(FeatureLayer layer)
         {
-<<<<<<< Updated upstream
-            return await Task.Run(() => new List<SpelData>());
-        }
-
-        private List<SpelData> BlandaOchVäljFrågor(List<SpelData> allaData, int antal)
-        {
-            var random = new Random();
-            return allaData.OrderBy(x => random.Next()).Take(antal).ToList();
-=======
             return await QueuedTask.Run(() =>
             {
                 var spelDataList = new List<SpelData>();
+
+                if (layer == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Layer är null i SkapaSpelData");
+                    return spelDataList;
+                }
 
                 try
                 {
                     var featureClass = layer.GetFeatureClass();
 
-                    var fieldNames = featureClass.GetDefinition().GetFields().Select(f => f.Name).ToList();
-                    System.Diagnostics.Debug.WriteLine($"SKAPELSEDATA: Bearbetar {fieldNames.Count} fält");
-
-                    var queryFilter = new QueryFilter()
+                    if (featureClass == null)
                     {
-                        WhereClause = "1=1"
-                    };
+                        System.Diagnostics.Debug.WriteLine("FeatureClass är null");
+                        return spelDataList;
+                    }
+
+                    var queryFilter = new QueryFilter() { WhereClause = "1=1" };
 
                     using (var rowCursor = featureClass.Search(queryFilter))
                     {
@@ -732,19 +524,17 @@ namespace SverigeSpelet
 
                                 if (geometry != null && !string.IsNullOrEmpty(namn))
                                 {
-                                    var kommunkod = int.TryParse(kommunkodStr, out int result) ? result : counter;
-
                                     spelDataList.Add(new SpelData
                                     {
                                         Namn = namn,
                                         Geometri = geometry,
-                                        Kommunkod = kommunkod.ToString()
+                                        Kommunkod = kommunkodStr ?? counter.ToString()
                                     });
                                     counter++;
                                 }
                             }
                         }
-                        System.Diagnostics.Debug.WriteLine($"Hämtade {counter} kommuner med korrekta fält");
+                        System.Diagnostics.Debug.WriteLine($"Hämtade {counter} kommuner");
                     }
                 }
                 catch (Exception ex)
@@ -755,19 +545,32 @@ namespace SverigeSpelet
                 return spelDataList;
             });
         }
+
         private List<SpelData> BlandaOchValjFragor(List<SpelData> allaData, int antalFragor)
         {
             var random = new Random();
             return allaData.OrderBy(x => random.Next()).Take(antalFragor).ToList();
->>>>>>> Stashed changes
+        }
+
+        private List<SpelData> SkapaTestData()
+        {
+            System.Diagnostics.Debug.WriteLine("Skapar testdata...");
+
+            return new List<SpelData>
+            {
+                new SpelData { Namn = "Stockholm", Kommunkod = "0180" },
+                new SpelData { Namn = "Göteborg", Kommunkod = "1480" },
+                new SpelData { Namn = "Malmö", Kommunkod = "1280" },
+                new SpelData { Namn = "Uppsala", Kommunkod = "0380" },
+                new SpelData { Namn = "Linköping", Kommunkod = "0580" },
+                new SpelData { Namn = "Örebro", Kommunkod = "1880" },
+                new SpelData { Namn = "Helsingborg", Kommunkod = "1283" },
+                new SpelData { Namn = "Jönköping", Kommunkod = "0680" },
+                new SpelData { Namn = "Umeå", Kommunkod = "2480" },
+                new SpelData { Namn = "Lund", Kommunkod = "1281" }
+            };
         }
 
         #endregion
     }
 }
-
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
