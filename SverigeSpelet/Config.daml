@@ -11,11 +11,6 @@
 	</AddInInfo>
 	<modules>
 		<insertModule id="SverigeSpelet_Module" className="Module1" autoLoad="false" caption="SverigeSpelet">
-			<tabs>
-				<!--<tab id="SverigeSpelet_Tab1" caption="New Tab">
-          <group refID="SverigeSpelet_Group1"/>
-        </tab>-->
-			</tabs>
 
 			<groups>
 				<group id="SverigeSpelet_Group1" caption="Sverige Spelet" appearsOnAddInTab="true" keytip="SG">
@@ -28,7 +23,7 @@
 
 			<controls>
 				<!-- Knapp för att visa dockpanelen -->
-				<button id="SverigeSpelet_SverigeSpelet_ShowButton" caption="Sverige Spelet" className="SverigeSpelet_ShowButton" loadOnClick="true" keytip="SSB" smallImage="Images\AddinDesktop16.png" largeImage="Images\AddinDesktop32.png">
+				<button id="SverigeSpelet_SverigeSpelet_ShowButton" caption="Visa Spelet" className="SverigeSpelet_ShowButton" loadOnClick="true" keytip="SSB" smallImage="Images\AddinDesktop16.png" largeImage="Images\AddinDesktop32.png">
 					<tooltip heading="Sverige Spelet">
 						Starta spelet för att testa din geografikunskap
 						<disabledText />
@@ -43,6 +38,7 @@
 					</tooltip>
 				</tool>
 			</controls>
+			
 			<!-- Flytta dockPane här inuti modules -->
 			<dockPanes>
 				<dockPane id="SverigeSpelet_SverigeSpeletDockpane" caption="Sverige Spelet" className="SverigeSpeletDockpaneViewModel">

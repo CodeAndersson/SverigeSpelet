@@ -25,9 +25,6 @@ namespace SverigeSpelet
     {
         private static Module1 _this = null;
 
-        /// <summary>
-        /// Retrieve the singleton instance to this module here
-        /// </summary>
         public static Module1 Current => _this ??= (Module1)FrameworkApplication.FindModule("SverigeSpelet_Module");
 
         #region Overrides

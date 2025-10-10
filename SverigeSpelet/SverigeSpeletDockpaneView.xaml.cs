@@ -15,9 +15,8 @@ using System.Windows.Shapes;
 
 namespace SverigeSpelet
 {
-    /// <summary>
     /// Interaction logic for SverigeSpeletDockpaneView.xaml
-    /// </summary>
+
     public partial class SverigeSpeletDockpaneView : UserControl
     {
         public SverigeSpeletDockpaneView()
@@ -27,7 +26,6 @@ namespace SverigeSpelet
 
         private void BtnStarta_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            // Denna kod kommer att kopplas till ViewModel
             var viewModel = this.DataContext as SverigeSpeletDockpaneViewModel;
             viewModel?.StartaSpel();
         }
