@@ -1,87 +1,149 @@
 ﻿<UserControl x:Class="SverigeSpelet.SverigeSpeletDockpaneView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="300">
-    <Grid Margin="5">
+
+    <UserControl.Resources>
+        <!-- Konverterar bool till Visibility -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+
         <TabControl>
-            <!-- Huvudflikan - visar antingen inställningar eller spel -->
+            <!-- === Flik 1: Spelet === -->
             <TabItem Header="Sverige Spelet" x:Name="tabHuvud">
                 <Grid Height="414" Width="285">
-                    <!-- START VY -->
-                    <StackPanel x:Name="pnlInställningar" Margin="10" Visibility="{Binding ShowSettingsView}">
+
+                    <!-- === START-VY === -->
+                    <StackPanel x:Name="pnlInställningar"
+                                Margin="10"
+                                Visibility="{Binding ShowSettingsView, Converter={StaticResource BoolToVis}}">
+
+                        <TextBlock Text="SverigeSpelet" FontSize="18" FontWeight="Bold"
+                                   HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
                         <TextBlock Text="Välj kategori:" FontWeight="Bold" Margin="0,0,0,5"/>
                         <ComboBox x:Name="cmbKategori" Height="25" Margin="0,0,0,15">
                             <ComboBoxItem Content="Kommuner" IsSelected="True"/>
                         </ComboBox>
 
-                        <TextBlock Text="Svårighetsgrad:" FontWeight="Bold" Margin="0,0,0,5" />
-                        <ComboBox x:Name="cmbSvårighet" Height="25" Margin="0,0,0,15">
-                            <ComboBoxItem Content="Lätt" IsSelected="True"/>
+                        <TextBlock Text="Svårighetsgrad:" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <ComboBox x:Name="cmbSvårighet"
+                                  Height="25" Margin="0,0,0,15"
+                                  SelectedValue="{Binding DifficultyLevel, Mode=TwoWay}">
+                            <ComboBoxItem Content="Lätt"/>
                             <ComboBoxItem Content="Medel"/>
                             <ComboBoxItem Content="Svår"/>
                         </ComboBox>
 
                         <TextBlock Text="Spelarens namn:" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBox x:Name="txtSpelareNamn" Height="25" Margin="0,0,0,20" Text="Gäst"/>
+                        <TextBox x:Name="txtSpelareNamn"
+                                 Height="25" Margin="0,0,0,20"
+                                 Text="{Binding PlayerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <Button x:Name="btnStarta" Content="Starta Spelet" Height="30" FontWeight="Bold"
-                                Background="#FF0078D7" Foreground="White" Click="BtnStarta_Click"/>
+                        <Button x:Name="btnStarta"
+                                Content="Starta Spelet"
+                                Height="35"
+                                FontWeight="Bold"
+                                Background="#FF0078D7"
+                                Foreground="White"
+                                Command="{Binding StartGameCommand}"
+                                HorizontalAlignment="Center"
+                                Width="150"/>
                     </StackPanel>
 
-                    <!-- SPEL VY -->
-                    <StackPanel x:Name="pnlSpel" Margin="10" Visibility="{Binding ShowGameView}" >
+                    <!-- === SPEL-VY === -->
+                    <StackPanel x:Name="pnlSpel"
+                                Margin="10"
+                                Visibility="{Binding ShowGameView, Converter={StaticResource BoolToVis}}">
+
                         <!-- Frågetext -->
-                        <TextBlock x:Name="txtFråga" FontSize="16" FontWeight="Bold" TextWrapping="Wrap"
-                                  Margin="0,0,0,15" MinHeight="40" Background="#FFF0F0F0" Padding="5"/>
-                        <!-- PROGRESS BAR med tidtext -->
+                        <TextBlock x:Name="txtFråga"
+                                   Text="{Binding CurrentQuestion}"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,15"
+                                   MinHeight="40"
+                                   Background="#FFF0F0F0"
+                                   Padding="5"
+                                   TextAlignment="Center"/>
+
+                        <!-- Tid och progress -->
                         <Grid Margin="0,0,0,15" Height="40">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="20"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
-                            <!-- Progress bar -->
                             <Border Grid.Row="0" BorderBrush="LightGray" BorderThickness="1" VerticalAlignment="Center">
                                 <ProgressBar Height="15" Margin="2" Value="{Binding TimeProgress}"/>
                             </Border>
-
-                            <!-- Tid kvar text UNDER progress bar -->
-                            <TextBlock Grid.Row="1" Text="{Binding TimeLeftText}" FontSize="11"
-                                      HorizontalAlignment="Center" Margin="0,5,0,0" Foreground="DarkGray"/>
+                            <TextBlock Grid.Row="1"
+                                       Text="{Binding TimeLeftText}"
+                                       FontSize="11"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,5,0,0"
+                                       Foreground="DarkGray"/>
                         </Grid>
 
-                        <!-- Poänginformation -->
-                        <TextBlock Text="{Binding PointsText}" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
-                        <TextBlock Text="{Binding QuestionCountText}" FontSize="12" Margin="0,0,0,15"/>
+                        <!-- Poäng & status -->
+                        <TextBlock Text="{Binding PointsText}"
+                                   FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding QuestionCountText}"
+                                   FontSize="12" Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding ResultText}"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="DarkGreen"
+                                   TextAlignment="Center"
+                                   Margin="0,5,0,20"
+                                   MinHeight="25"/>
 
-                        <!-- Resultattext -->
-                        <TextBlock Text="{Binding ResultText}" FontSize="12" FontWeight="Bold"
-                                  MinHeight="30" VerticalAlignment="Center" TextAlignment="Center"
-                                  Foreground="Green" Margin="0,0,0,20"/>
-
-                        <!-- Avsluta knapp -->
-                        <Button x:Name="btnAvsluta" Content="Avsluta Spel" Height="25" Margin="0,20,0,0"
-                                Background="#FFD9534F" Foreground="White" Click="BtnAvsluta_Click"/>
+                        <!-- Avsluta spel -->
+                        <Button x:Name="btnAvsluta"
+                                Content="Avsluta Spel"
+                                Height="30"
+                                Width="150"
+                                HorizontalAlignment="Center"
+                                Background="#FFD9534F"
+                                Foreground="White"
+                                FontWeight="Bold"
+                                Command="{Binding EndGameCommand}"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
-            <!-- Topplista-flikan -->
+            <!-- === Flik 2: Topplista === -->
             <TabItem Header="Topplista">
                 <StackPanel Margin="10">
-                    <TextBlock Text="Veckans topplista" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                    <DataGrid x:Name="dgTopplista" Height="300" AutoGenerateColumns="False" ItemsSource="{Binding TopList}">
+                    <TextBlock Text="🏆 Veckans topplista"
+                               FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+
+                    <DataGrid x:Name="dgTopplista"
+                              Height="300"
+                              AutoGenerateColumns="False"
+                              ItemsSource="{Binding TopList}"
+                              CanUserAddRows="False" IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Namn" Binding="{Binding PlayerName}" Width="*"/>
-                            <DataGridTextColumn Header="Poäng" Binding="{Binding Points}" Width="80"/>
+                            <DataGridTextColumn Header="Poäng" Binding="{Binding Points}" Width="70"/>
                             <DataGridTextColumn Header="Svårighet" Binding="{Binding DifficultyLevel}" Width="80"/>
+                            <DataGridTextColumn Header="Datum" Binding="{Binding Date, StringFormat={}{0:dd/MM}}" Width="60"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button x:Name="btnUppdateraTopplista" Content="Uppdatera topplista"
-                            Margin="0,10,0,0" Height="25" Click="BtnUppdateraTopplista_Click"/>
+
+                    <Button x:Name="btnUppdateraTopplista"
+                            Content="Uppdatera topplista"
+                            Margin="0,10,0,0"
+                            Height="30"
+                            Width="180"
+                            HorizontalAlignment="Center"
+                            Command="{Binding UpdateTopListCommand}"
+                            Background="#FF0078D7" Foreground="White" FontWeight="Bold"/>
                 </StackPanel>
             </TabItem>
         </TabControl>

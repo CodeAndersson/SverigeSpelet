@@ -27,6 +27,12 @@ namespace SverigeSpelet
         private async void BtnStarta_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var viewModel = this.DataContext as SverigeSpeletDockpaneViewModel;
+            viewModel?.StartaSpel();
+        }
+
+        private void BtnAvsluta_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var viewModel = this.DataContext as SverigeSpeletDockpaneViewModel;
             viewModel?.AvslutaSpel();
         }
 

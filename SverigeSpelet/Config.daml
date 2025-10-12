@@ -1,33 +1,4 @@
-<<<<<<< Updated upstream
-﻿<?xml version="1.0" encoding="utf-8" ?>
 <ArcGIS defaultAssembly="SverigeSpelet.dll" defaultNamespace="SverigeSpelet" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
-	<AddInInfo id="{1fa88063-c0eb-4272-83cf-21ef5bd1a30a}" version="1.0" desktopVersion="3.5">
-		<Name>SverigeSpelet</Name>
-		<Description>Ett spel för att testa din kunskap om Sveriges geografi</Description>
-		<Image>Images\AddinDesktop32.png</Image>
-		<Author>alande</Author>
-		<Company>Lantmateriet</Company>
-		<Date>10/6/2025 11:32:16 AM</Date>
-		<Subject>Framework</Subject>
-	</AddInInfo>
-	<modules>
-		<insertModule id="SverigeSpelet_Module" className="Module1" autoLoad="false" caption="SverigeSpelet">
-
-			<groups>
-				<group id="SverigeSpelet_Group1" caption="Sverige Spelet" appearsOnAddInTab="true" keytip="SG">
-					<!-- Knapp för att öppna dockpanelen -->
-					<button refID="SverigeSpelet_SverigeSpelet_ShowButton"/>
-					<!-- Tool för kartinteraktion -->
-					<tool refID="SverigeSpelet_SverigeSpeletMapTool"/>
-				</group>
-			</groups>
-
-			<controls>
-				<!-- Knapp för att visa dockpanelen -->
-				<button id="SverigeSpelet_SverigeSpelet_ShowButton" caption="Visa Spelet" className="SverigeSpelet_ShowButton" loadOnClick="true" keytip="SSB" smallImage="Images\AddinDesktop16.png" largeImage="Images\AddinDesktop32.png">
-					<tooltip heading="Sverige Spelet">
-=======
-﻿<ArcGIS defaultAssembly="SverigeSpelet.dll" defaultNamespace="SverigeSpelet" xmlns="http://schemas.esri.com/DADF/Registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/Program%20Files/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd">
   <AddInInfo id="{1fa88063-c0eb-4272-83cf-21ef5bd1a30a}" version="1.0" desktopVersion="3.5">
     <Name>SverigeSpelet</Name>
     <Description>Ett spel för att testa din kunskap om Sveriges geografi</Description>
@@ -41,53 +12,34 @@
     <insertModule id="SverigeSpelet_Module" className="Module1" autoLoad="false" caption="SverigeSpelet">
       <groups>
         <group id="SverigeSpelet_Group1" caption="Sverige Spelet" appearsOnAddInTab="true" keytip="SG">
-          <!-- Knapp för att öppna dockpanelen -->
           <button refID="SverigeSpelet_ShowButton" />
-          <!-- Tool för kartinteraktion -->
           <tool refID="SverigeSpelet_SverigeSpeletMapTool" />
-          <button refID="SverigeSpelet_SverigeSpelet_ShowButton" size="large" />
+          <button refID="SverigeSpelet_SverigeSpeletDockpaneViewPlay_ShowButton" size="large" />
         </group>
       </groups>
       <controls>
-        <!-- Knapp för att visa dockpanelen -->
-        <button id="SverigeSpelet_ShowButton" caption="Visa Spelet" className="SverigeSpelet_ShowButton" loadOnClick="true" keytip="SSB" smallImage="Images\AddinDesktop16.png" largeImage="Images\AddinDesktop32.png">
+        <button id="SverigeSpelet_ShowButton" caption="Visa Spelet" className="SverigeSpelet_ShowButton" loadOnClick="true" keytip="SSB" smallImage="Images\\AddinDesktop16.png" largeImage="Images\\AddinDesktop32.png">
           <tooltip heading="Sverige Spelet">
->>>>>>> Stashed changes
 						Starta spelet för att testa din geografikunskap
 						<disabledText /></tooltip>
         </button>
-        <!-- MapTool för kartinteraktion -->
-        <tool id="SverigeSpelet_SverigeSpeletMapTool" caption="Sverige Spelet Tool" className="SverigeSpeletMapTool" loadOnClick="true" keytip="SMT" smallImage="Images\AddinDesktop16.png" largeImage="Images\AddinDesktop32.png" condition="esri_mapping_mapPane">
+        <tool id="SverigeSpelet_SverigeSpeletMapTool" caption="Sverige Spelet Tool" className="SverigeSpeletMapTool" loadOnClick="true" keytip="SMT" smallImage="Images\\AddinDesktop16.png" largeImage="Images\\AddinDesktop32.png" condition="esri_mapping_mapPane">
           <tooltip heading="Sverige Spelet Tool">
 						Klicka på kartan för att gissa platser i spelet
-<<<<<<< Updated upstream
-						<disabledText />
-					</tooltip>
-				</tool>
-			</controls>
-			
-			<!-- Flytta dockPane här inuti modules -->
-			<dockPanes>
-				<dockPane id="SverigeSpelet_SverigeSpeletDockpane" caption="Sverige Spelet" className="SverigeSpeletDockpaneViewModel">
-					<content className="SverigeSpeletDockpaneView"/>
-				</dockPane>
-			</dockPanes>
-		</insertModule>
-	</modules>
-=======
 						<disabledText /></tooltip>
         </tool>
-        <button id="SverigeSpelet_SverigeSpelet_ShowButton" caption="SverigeSpelet _ShowButton" className="SverigeSpelet_ShowButton" loadOnClick="true" smallImage="GenericButtonBlue16" largeImage="GenericButtonBlue32">
-          <tooltip heading="Tooltip Heading">Tooltip text<disabledText /></tooltip>
+        <button id="SverigeSpelet_SverigeSpeletDockpaneViewPlay_ShowButton" caption="Show SverigeSpeletDockpaneViewPlay" className="SverigeSpeletDockpaneViewPlay_ShowButton" loadOnClick="true" smallImage="GenericButtonPurple16" largeImage="GenericButtonPurple32">
+          <tooltip heading="Show Dockpane">Show Dockpane<disabledText /></tooltip>
         </button>
       </controls>
-      <!-- DockPane -->
       <dockPanes>
-        <dockPane id="SverigeSpelet_SverigeSpeletDockpane" caption="Sverige Spelet" className="SverigeSpeletDockpaneViewModel">
+        <dockPane id="SverigeSpelet_SverigeSpeletDockpane" caption="Sverige Spelet" className="SverigeSpeletDockpaneViewModel" keytip="SDP">
           <content className="SverigeSpeletDockpaneView" />
+        </dockPane>
+        <dockPane id="SverigeSpelet_SverigeSpeletDockpaneViewPlay" caption="SverigeSpeletDockpaneViewPlay" className="SverigeSpeletDockpaneViewPlayViewModel" dock="group" dockWith="esri_core_projectDockPane">
+          <content className="SverigeSpeletDockpaneViewPlayView" />
         </dockPane>
       </dockPanes>
     </insertModule>
   </modules>
->>>>>>> Stashed changes
 </ArcGIS>
