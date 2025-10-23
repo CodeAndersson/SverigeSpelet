@@ -22,8 +22,7 @@ namespace SverigeSpelet
     public class SverigeSpeletDockpaneViewModel : DockPane, INotifyPropertyChanged
     {
         private const string _dockPaneID = "SverigeSpelet_SverigeSpeletDockpane";
-
-        // --- Fält ---
+        // Props
         private bool _showGameView;
         private bool _showSettingsView = true;
         private string _currentQuestion;
@@ -42,7 +41,39 @@ namespace SverigeSpelet
         private DispatcherTimer _timer;
         private List<SpelData> _currentQuestions = new();
 
-        // --- Egenskaper för binding ---
+        private Geometry _userGuessGeometry;
+        private Geometry _correctAnswerGeometry;
+        private Geometry _lineGeometry;
+        private string _distanceText;
+        private bool _showLine;
+
+
+        // Egenskaper för binding
+        private Geometry UserGuessGeometry
+        {
+            get => _userGuessGeometry;
+            set => SetProperty(ref _userGuessGeometry, value);
+        }
+        private Geometry CorrectAnswerGeometry
+        {
+            get => _correctAnswerGeometry;
+            set => SetProperty(ref _correctAnswerGeometry, value);
+        }
+        private Geometry LineGeometry
+        {
+            get => _lineGeometry;
+            set => SetProperty(ref _lineGeometry, value);
+        }
+        private string DistanceText
+        {
+            get => _distanceText;
+            set => SetProperty(ref _distanceText, value);
+        }
+        private bool ShowLine
+        {
+            get => _showLine;
+            set => SetProperty(ref _showLine, value);
+        }
         public bool ShowSettingsView
         {
             get => _showSettingsView;
@@ -93,12 +124,12 @@ namespace SverigeSpelet
 
         public List<SpelResultat> TopList { get; set; } = new();
 
-        // --- Commands ---
+        // Commands
         public ICommand StartGameCommand { get; }
         public ICommand EndGameCommand { get; }
         public ICommand UpdateTopListCommand { get; }
 
-        // --- Konstruktor ---
+        // Konstruktor
         protected SverigeSpeletDockpaneViewModel() : base()
         {
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -155,7 +186,12 @@ namespace SverigeSpelet
             var layer = await HamtaFeatureLayer();
             _currentQuestions = layer != null
                 ? BlandaOchValjFragor(await SkapaSpelData(layer), 10)
-                : SkapaTestData();
+                : new List<SpelData>(); 
+
+            if (_currentQuestions.Count == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("Varning: Inga frågor kunde skapas");
+            }
         }
 
         private async Task NextQuestion()
@@ -248,10 +284,9 @@ namespace SverigeSpelet
 
             SparaResultat();
             UppdateraTopplista();
-
             ResultText = $"Spelet avslutat! Slutpoäng: {_totalPoints}";
+            
             await Task.Delay(2000);
-
             ShowGameView = false;
             ShowSettingsView = true;
         }
@@ -336,6 +371,13 @@ namespace SverigeSpelet
 
         #region === Hjälpmetoder ===
 
+        private void UpdateScoreBasedOnDistance(double distance)
+        {
+            int points = (int)(100 / (distance + 1));
+            _totalPoints += Math.Max(points, 1);
+            PointsText = $"Totalpoäng: { _totalPoints }";
+        }
+
         private async Task InitieraKarta()
         {
             await QueuedTask.Run(async () =>
@@ -390,29 +432,15 @@ namespace SverigeSpelet
             return alla.OrderBy(_ => rnd.Next()).Take(antal).ToList();
         }
 
-        private List<SpelData> SkapaTestData() => new()
-        {
-            new() { Namn = "Stockholm" },
-            new() { Namn = "Göteborg" },
-            new() { Namn = "Malmö" },
-            new() { Namn = "Uppsala" },
-            new() { Namn = "Lund" },
-            new() { Namn = "Örebro" },
-            new() { Namn = "Västerås" },
-            new() { Namn = "Umeå" },
-            new() { Namn = "Linköping" },
-            new() { Namn = "Jönköping" }
-        };
-
         #endregion
 
-        #region === INotifyPropertyChanged & Hjälp ===
+        #region  INotifyPropertyChanged & Hjälp 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void NotifyPropertyChanged([CallerMemberName] string name = "")
+        protected new void NotifyPropertyChanged([CallerMemberName] string name = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-        protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string name = "")
+        protected new bool SetProperty<T>(ref T field, T value, [CallerMemberName] string name = "")
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
                 return false;
