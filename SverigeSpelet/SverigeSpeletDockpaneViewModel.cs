@@ -202,7 +202,7 @@ namespace SverigeSpelet
         public ICommand UpdateTopListCommand { get; }
         public ICommand ShowOnMapCommand { get;private set; }
 
-        // Konstruktor
+        // Construktor
         protected SverigeSpeletDockpaneViewModel() : base()
         {
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
