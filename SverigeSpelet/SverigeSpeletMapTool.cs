@@ -27,32 +27,34 @@ namespace SverigeSpelet
 
         protected override Task HandleMouseDownAsync(MapViewMouseButtonEventArgs e)
         {
-            return QueuedTask.Run(() =>
+            if (e.ChangedButton == MouseButton.Left)
             {
-                try
+                return QueuedTask.Run(() =>
                 {
-                    System.Diagnostics.Debug.WriteLine("MapTool: HandleMouseDownAsync startar");
-
-                    var mapClickPoint = MapView.Active.ClientToMap(e.ClientPoint);
-                    System.Diagnostics.Debug.WriteLine($"Klickposition: {mapClickPoint.X}, {mapClickPoint.Y}");
-
-                    var dockpane = FrameworkApplication.DockPaneManager.Find("SverigeSpelet_SverigeSpeletDockpane") as SverigeSpeletDockpaneViewModel;
-
-                    if (dockpane != null)
+                    try
                     {
-                        System.Diagnostics.Debug.WriteLine("Skickar kartklick till DockPane");
-                        dockpane.HanteraKartKlick(mapClickPoint);
+                        var mapClickPoint = MapView.Active.ClientToMap(e.ClientPoint);
+                        System.Diagnostics.Debug.WriteLine($"Klickposition: {mapClickPoint.X:F2}, {mapClickPoint.Y:F2}");
+
+                        var dockpane = FrameworkApplication.DockPaneManager.Find("SverigeSpelet_SverigeSpeletDockpane") as SverigeSpeletDockpaneViewModel;
+
+                        if (dockpane != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Skickar kartklick till DockPane");
+                            dockpane.HanteraKartKlick(mapClickPoint);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("DockPane inte hittad");
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine("DockPane inte hittad");
+                        System.Diagnostics.Debug.WriteLine($"Fel i MapTool: {ex.Message}");
                     }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Fel i MapTool: {ex.Message}");
-                }
-            });
+                });
+            }
+            return Task.CompletedTask;
         }
 
     }

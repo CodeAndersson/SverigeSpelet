@@ -24,7 +24,7 @@ namespace SverigeSpelet
             InitializeComponent();
         }
 
-        private async void BtnStarta_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void BtnStarta_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var viewModel = this.DataContext as SverigeSpeletDockpaneViewModel;
             viewModel?.StartaSpel();
@@ -36,10 +36,21 @@ namespace SverigeSpelet
             viewModel?.AvslutaSpel();
         }
 
-        private void BtnUppdateraTopplista_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void BtnUppdateraTopplista_Click(object sender, RoutedEventArgs e)
         {
             var viewModel = this.DataContext as SverigeSpeletDockpaneViewModel;
             viewModel?.UppdateraTopplista();
         }
+
+        private void HistoryItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.DataContext is SpelHistorik historikItem)
+            {
+                var viewModel = DataContext as SverigeSpeletDockpaneViewModel;
+                viewModel?.OnShowOnMap(historikItem);
+            }
+            e.Handled = true;
+        }
+
     }
 }

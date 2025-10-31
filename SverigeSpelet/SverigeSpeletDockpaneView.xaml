@@ -10,112 +10,180 @@
     <UserControl.Resources>
         <!-- Konverterar bool till Visibility -->
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <local:BoolToEmojiConverter x:Key="BoolToEmoji"/>
     </UserControl.Resources>
 
     <Grid Margin="10">
-
         <TabControl>
+
             <!-- === Flik 1: Spelet === -->
             <TabItem Header="Sverige Spelet" x:Name="tabHuvud">
-                <Grid Height="414" Width="285">
+                <!-- ScrollViewer gör att allt syns även om det blir långt -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="10">
+                        
+                        <!-- === START-VY === -->
+                        <StackPanel x:Name="pnlInställningar"
+                        Margin="0"
+                        Visibility="{Binding ShowSettingsView, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="SverigeSpelet" FontSize="18" FontWeight="Bold"
+                           HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                            <TextBlock Text="Välj kategori:" FontWeight="Bold" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="cmbKategori" Height="25" Margin="0,0,0,10">
+                                <ComboBoxItem Content="Kommuner" IsSelected="True"/>
+                            </ComboBox>
 
-                    <!-- === START-VY === -->
-                    <StackPanel x:Name="pnlInställningar"
-                                Margin="10"
-                                Visibility="{Binding ShowSettingsView, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Svårighetsgrad:" FontWeight="Bold" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="cmbSvårighet"
+                                      Height="25" Margin="0,0,0,15"
+                                      ItemsSource="{Binding DifficultyLevels}"
+                                      SelectedItem="{Binding DifficultyLevel, Mode=TwoWay}"/>
 
-                        <TextBlock Text="SverigeSpelet" FontSize="18" FontWeight="Bold"
-                                   HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                            <TextBlock Text="Spelarens namn:" FontWeight="Bold" Margin="0,0,0,5"/>
+                            <TextBox x:Name="txtSpelareNamn"
+                         Height="25" Margin="0,0,0,15"
+                         Text="{Binding PlayerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <TextBlock Text="Välj kategori:" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <ComboBox x:Name="cmbKategori" Height="25" Margin="0,0,0,15">
-                            <ComboBoxItem Content="Kommuner" IsSelected="True"/>
-                        </ComboBox>
+                            <Button x:Name="btnStarta"
+                        Content="Starta Spelet"
+                        Height="35"
+                        FontWeight="Bold"
+                        Background="#FF0078D7"
+                        Foreground="White"
+                        Command="{Binding StartGameCommand}"
+                        HorizontalAlignment="Center"
+                        Width="150"/>
+                        </StackPanel>
 
-                        <TextBlock Text="Svårighetsgrad:" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <ComboBox x:Name="cmbSvårighet"
-                                  Height="25" Margin="0,0,0,15"
-                                  SelectedValue="{Binding DifficultyLevel, Mode=TwoWay}">
-                            <ComboBoxItem Content="Lätt"/>
-                            <ComboBoxItem Content="Medel"/>
-                            <ComboBoxItem Content="Svår"/>
-                        </ComboBox>
+                        <!-- === SPEL-VY === -->
+                        <StackPanel x:Name="pnlSpel"
+                        Margin="0"
+                        Visibility="{Binding ShowGameView, Converter={StaticResource BoolToVis}}">
+                            <TextBlock x:Name="txtFråga"
+                           Text="{Binding CurrentQuestion}"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,10"
+                           MinHeight="40"
+                           Background="#FFF0F0F0"
+                           Padding="8"
+                           TextAlignment="Center"/>
 
-                        <TextBlock Text="Spelarens namn:" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBox x:Name="txtSpelareNamn"
-                                 Height="25" Margin="0,0,0,20"
-                                 Text="{Binding PlayerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="{Binding DistanceInfo}" FontSize="13" FontWeight="SemiBold" Foreground="DarkBlue" TextAlignment="Center" Margin="0,0,0,3"/>
+                            <TextBlock Text="{Binding PinInfo}" FontSize="11" Foreground="Gray" FontStyle="Italic" TextAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap"/>
 
-                        <Button x:Name="btnStarta"
-                                Content="Starta Spelet"
-                                Height="35"
-                                FontWeight="Bold"
-                                Background="#FF0078D7"
-                                Foreground="White"
-                                Command="{Binding StartGameCommand}"
-                                HorizontalAlignment="Center"
-                                Width="150"/>
-                    </StackPanel>
+                            <Grid Margin="0,0,0,10" Height="45">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0" BorderBrush="LightGray" BorderThickness="1" VerticalAlignment="Center">
+                                    <ProgressBar Height="18" Margin="2" Value="{Binding TimeProgress}"/>
+                                </Border>
+                                <TextBlock Grid.Row="1"
+                               Text="{Binding TimeLeftText}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"
+                               Margin="0,5,0,0"
+                               Foreground="DarkGray"
+                               FontWeight="SemiBold"/>
+                            </Grid>
 
-                    <!-- === SPEL-VY === -->
-                    <StackPanel x:Name="pnlSpel"
-                                Margin="10"
-                                Visibility="{Binding ShowGameView, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="{Binding PointsText}"
+                           FontSize="15" FontWeight="Bold" Margin="0,0,0,5" Foreground="DarkGreen"/>
+                            <TextBlock Text="{Binding QuestionCountText}"
+                           FontSize="13" Margin="0,0,0,10" FontWeight="SemiBold"/>
 
-                        <!-- Frågetext -->
-                        <TextBlock x:Name="txtFråga"
-                                   Text="{Binding CurrentQuestion}"
-                                   FontSize="16"
-                                   FontWeight="Bold"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,15"
-                                   MinHeight="40"
-                                   Background="#FFF0F0F0"
-                                   Padding="5"
-                                   TextAlignment="Center"/>
-
-                        <!-- Tid och progress -->
-                        <Grid Margin="0,0,0,15" Height="40">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0" BorderBrush="LightGray" BorderThickness="1" VerticalAlignment="Center">
-                                <ProgressBar Height="15" Margin="2" Value="{Binding TimeProgress}"/>
+                            <Border Background="#FFF8F8F8" BorderBrush="LightGray" BorderThickness="1"
+                        CornerRadius="3" Padding="8" Margin="0,0,0,10">
+                                <TextBlock Text="{Binding ResultText}"
+                               FontSize="14"
+                               FontWeight="Bold"
+                               Foreground="DarkGreen"
+                               TextAlignment="Left"
+                               MinHeight="30"/>
                             </Border>
-                            <TextBlock Grid.Row="1"
-                                       Text="{Binding TimeLeftText}"
-                                       FontSize="11"
-                                       HorizontalAlignment="Center"
-                                       Margin="0,5,0,0"
-                                       Foreground="DarkGray"/>
-                        </Grid>
 
-                        <!-- Poäng & status -->
-                        <TextBlock Text="{Binding PointsText}"
-                                   FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
-                        <TextBlock Text="{Binding QuestionCountText}"
-                                   FontSize="12" Margin="0,0,0,10"/>
-                        <TextBlock Text="{Binding ResultText}"
-                                   FontSize="13"
-                                   FontWeight="Bold"
-                                   Foreground="DarkGreen"
-                                   TextAlignment="Center"
-                                   Margin="0,5,0,20"
-                                   MinHeight="25"/>
+                            <Border Background="#FFF0F7FF" BorderBrush="#FFBBDEFB" BorderThickness="1"
+                        CornerRadius="3" Padding="8" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                        <TextBlock Text="📈" FontSize="14" Margin="0,0,5,0"/>
+                                        <TextBlock Text="{Binding HistorikSammanfattning}"
+                                       FontSize="12" FontWeight="SemiBold" Foreground="#FF1565C0"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding SpelHistorik.Count, StringFormat={}Totalt: {0} frågor}"
+                                   FontSize="11" Foreground="Gray" Grid.Column="1"
+                                   VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
 
-                        <!-- Avsluta spel -->
-                        <Button x:Name="btnAvsluta"
-                                Content="Avsluta Spel"
-                                Height="30"
-                                Width="150"
-                                HorizontalAlignment="Center"
-                                Background="#FFD9534F"
-                                Foreground="White"
-                                FontWeight="Bold"
-                                Command="{Binding EndGameCommand}"/>
-                    </StackPanel>
-                </Grid>
+                            <!-- Historik med större utrymme -->
+                            <Border BorderBrush="LightGray" BorderThickness="1"
+                        Background="#FFF8F8F8" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Border Background="#FFE8E8E8" Padding="8" Grid.Row="0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="📊 Spelhistorik" FontWeight="Bold" FontSize="12" Grid.Column="0"/>
+                                            <TextBlock Text="{Binding SpelHistorik.Count, StringFormat={}({0})}"
+                                           FontSize="11" Foreground="Gray" Grid.Column="1"
+                                           VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" MaxHeight="250">
+                                        <ItemsControl ItemsSource="{Binding SpelHistorik}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Padding="6,4" Margin="1,0,1,1" BorderThickness="0,0,0,1" BorderBrush="#FFE0E0E0"
+                                                MouseLeftButtonDown="HistoryItem_MouseLeftButtonDown">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding VarRätt, Converter={StaticResource BoolToEmoji}}"
+                                                           FontSize="11" Margin="0,0,5,0"/>
+                                                            <TextBlock Text="{Binding Kommun}" FontWeight="SemiBold" FontSize="11" MinWidth="70"/>
+                                                            <TextBlock Text="-" FontSize="10" Foreground="Gray" Margin="3,0,3,0"/>
+                                                            <TextBlock Text="{Binding Poäng}" FontSize="10" Foreground="Green" FontWeight="Bold" MinWidth="20"/>
+                                                            <TextBlock Text="p" FontSize="8" Foreground="Green" Margin="0,0,5,0"/>
+                                                            <TextBlock Text="-" FontSize="10" Foreground="Gray" Margin="3,0,3,0"/>
+                                                            <TextBlock Text="{Binding Avstånd, StringFormat={}{0:F1}km}"
+                                                           FontSize="9" Foreground="Gray" MinWidth="40"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+
+                            <Button x:Name="btnAvsluta"
+                        Content="{Binding AvslutaKnappText}"
+                        Height="35"
+                        Width="160"
+                        HorizontalAlignment="Center"
+                        Background="#FFD9534F"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        FontSize="13"
+                        Command="{Binding EndGameCommand}"
+                        Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
             </TabItem>
 
             <!-- === Flik 2: Topplista === -->
@@ -147,6 +215,7 @@
                             Background="#FF0078D7" Foreground="White" FontWeight="Bold"/>
                 </StackPanel>
             </TabItem>
+            
         </TabControl>
     </Grid>
 </UserControl>
